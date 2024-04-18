@@ -27,16 +27,19 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
 
   const webcamRef = useRef<Webcam | null>(null)
 
+  const updateSizes = useCallback(() => {
+    setWidth(window.innerWidth)
+    setHeight(window.innerHeight)
+    setHorizontal(window.innerWidth >= window.innerHeight)
+  }, [])
+
   useEffect(() => {
     if (!webcamRef?.current?.video) return
 
     webcamRef.current.video.onloadeddata = () => {
-      setWidth(window.innerWidth)
-      setHeight(window.innerHeight)
-
-      setHorizontal(window.innerWidth >= window.innerHeight)
+      updateSizes()
     }
-  }, [webcamRef?.current?.video, width, height])
+  }, [webcamRef?.current?.video, updateSizes])
 
   // const [rotated, setRotated] = useState<boolean>(
   //   window.screen.orientation.angle == 90 || window.screen.orientation.angle == 270
@@ -66,17 +69,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     [height, width, selectedDeviceId, facingMode]
   )
 
-  const orientationOnchange = useCallback(() => {
-    setWidth(window.innerWidth)
-    setHeight(window.innerHeight)
-    setHorizontal(window.innerWidth >= window.innerHeight)
-  }, [])
-
-  window.onresize = () => {
-    setWidth(window.innerWidth)
-    setHeight(window.innerHeight)
-    setHorizontal(window.innerWidth >= window.innerHeight)
-  }
+  window.onresize = updateSizes
 
   const handleStartCamera = async () => {
     try {
@@ -227,9 +220,9 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     }
 
     if (window.screen.orientation) {
-      window.screen.orientation.onchange = orientationOnchange
+      window.screen.orientation.onchange = updateSizes
     }
-  }, [selectedDeviceId, videoConstraints, exitFullscreen, orientationOnchange])
+  }, [selectedDeviceId, videoConstraints, exitFullscreen, updateSizes])
 
   const style = useMemo(
     () => ({
