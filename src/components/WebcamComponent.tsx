@@ -31,8 +31,10 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     if (!webcamRef?.current?.video) return
 
     webcamRef.current.video.onloadeddata = () => {
-      width !== window.innerWidth && setWidth(window.innerWidth)
-      height !== window.innerHeight && setHeight(window.innerHeight)
+      setWidth(window.innerWidth)
+      setHeight(window.innerHeight)
+
+      setHorizontal(window.innerWidth >= window.innerHeight)
     }
   }, [webcamRef?.current?.video, width, height])
 
@@ -55,6 +57,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
         video: {
           height: { exact: height },
           width: { exact: width },
+          frameRate: { ideal: 60 },
         },
         deviceId: selectedDeviceId,
         audio: true,
@@ -64,24 +67,14 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   )
 
   const orientationOnchange = useCallback(() => {
-    window.navigator.mediaDevices
-      .getUserMedia({ video: videoConstraints })
-      .then(() => {
-        setWidth(window.innerWidth)
-        setHeight(window.innerHeight)
-      })
-      .catch((err) => alert("Error:" + err))
+    setWidth(window.innerWidth)
+    setHeight(window.innerHeight)
     setHorizontal(window.innerWidth >= window.innerHeight)
-  }, [videoConstraints])
+  }, [])
 
   window.onresize = () => {
-    window.navigator.mediaDevices
-      .getUserMedia({ video: videoConstraints })
-      .then(() => {
-        setWidth(window.innerWidth)
-        setHeight(window.innerHeight)
-      })
-      .catch((err) => alert("Error:" + err))
+    setWidth(window.innerWidth)
+    setHeight(window.innerHeight)
     setHorizontal(window.innerWidth >= window.innerHeight)
   }
 
@@ -90,9 +83,13 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
       navigator.mediaDevices
         .getUserMedia({ video: videoConstraints })
         .then(() => setIsCameraActive(true))
-        .catch((err) => alert("Error:" + err))
+        .catch((err) => {
+          alert("Error accessing camera: " + err)
+          setIsCameraActive(false)
+        })
     } catch (err) {
-      alert("Error accessing camera:" + err)
+      alert("Error accessing camera: " + err)
+      setIsCameraActive(false)
     }
   }
 
@@ -188,9 +185,14 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     const getDevices = async () => {
       try {
         await navigator.mediaDevices.getUserMedia({ video: true, ...(facingMode && { facingMode: facingMode }) })
+
         try {
           const mediaDevices = await navigator.mediaDevices.enumerateDevices()
-          setDevices(mediaDevices.filter((device) => device.deviceId !== "" && device.kind === "videoinput"))
+          const videoDevices = mediaDevices.filter((device) => device.deviceId !== "" && device.kind === "videoinput")
+          setDevices(videoDevices)
+          if (videoDevices.length === 0) return setNoCamera(true)
+
+          setSelectedDeviceId(videoDevices[0].deviceId)
         } catch {
           setDevices([])
         }
@@ -201,12 +203,6 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
 
     getDevices()
   }, [devices, facingMode])
-
-  useEffect(() => {
-    if (devices === null || devices.length === 0) return
-
-    setSelectedDeviceId(devices[0].deviceId)
-  }, [devices])
 
   const nextDevice = () => {
     if (devices === null || devices.length === 0) return
@@ -242,12 +238,12 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
       left: 0,
       height: height,
       width: width,
-      background: "black",
+      backgroundColor: "black",
       objectFit: "cover" as "cover",
       aspectRatio: `${((width * 1.0) / height) * 1.0}`,
       display: "block",
       transform: useMirror ? "scaleX(-1) " : "",
-      ...(isFullscreen && { zIndex: 9900 }), // Set a higher z-index for fullscreen
+      ...(isFullscreen && { zIndex: 9900 }),
     }),
     [height, width, isFullscreen, useMirror]
   )
@@ -267,13 +263,13 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   ) : (
     <>
       {isCameraActive ? (
-        <>
+        <Box id="webcam-interface">
           <Webcam ref={webcamRef} audio={false} videoConstraints={videoConstraints} height={height} width={width} style={style} />
           <CloseButton closeAction={exitFullscreen} />
           {!facingMode && devices.length > 1 && <ChangeDeviceButton changeDevice={nextDevice} horizontal={horizontal} />}
           <CaptureButton capture={capture} horizontal={horizontal} />
           <MirrorButton mirrorAction={() => setUseMirror(!useMirror)} horizontal={horizontal} />
-        </>
+        </Box>
       ) : (
         <Box
           sx={{
@@ -284,28 +280,19 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
             gap: "1rem",
           }}
         >
-          {src && (
-            <img
-              src={src}
-              style={{
-                width: "80vw",
-                maxWidth: 300,
-                borderRadius: "1rem",
-              }}
-              alt="Foto capturada"
-            />
-          )}
+          {src && <Box component="img" src={src} sx={{ width: "80vw", maxWidth: 300, borderRadius: "1rem" }} alt="Captura" />}
           <Button
             onClick={startFullScreen}
             id="open-camera"
-            disabled={devices === undefined || devices.length === 0 || isCameraActive}
+            disabled={selectedDeviceId === ""}
             sx={{
+              display: isCameraActive ? "none" : "block",
               padding: "1.5rem",
               color: "white",
-              backgroundColor: "black",
+              backgroundColor: "rgba(0, 0, 0, 0.35)",
               border: "0 solid black",
               borderRadius: "1rem",
-              boxShadow: "0 0 1rem rgba(0, 0, 0, 0.25)",
+              boxShadow: selectedDeviceId === "" ? "" : "0 0 1rem rgba(0, 0, 0, 0.25)",
               textOverflow: "ellipsis",
               maxWidth: "80vw",
               textTransform: "none",
