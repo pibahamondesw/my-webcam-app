@@ -7,7 +7,9 @@ function App() {
     <div
       className="App"
       style={{
-        height: "100vh",
+        height: "100%",
+        minHeight: "100vh",
+        overflow: "hidden",
         alignContent: "center",
         alignItems: "center",
         display: "flex",
