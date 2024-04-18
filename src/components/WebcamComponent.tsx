@@ -294,7 +294,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
           <Button
             onClick={startFullScreen}
             id="open-camera"
-            disabled={devices === undefined || devices.length === 0}
+            disabled={devices === undefined || devices.length === 0 || isCameraActive}
             sx={{
               padding: "1.5rem",
               color: "white",
