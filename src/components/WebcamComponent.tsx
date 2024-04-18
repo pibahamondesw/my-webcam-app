@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Webcam from "react-webcam";
 
+import { Box, Button } from "@mui/material";
+
 import CaptureButton from "./CaptureButton";
 import ChangeDeviceButton from "./ChangeDeviceButton";
 import CloseButton from "./CloseButton";
@@ -328,61 +330,14 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
       {isCameraActive ? (
         <>
           <Webcam ref={webcamRef} audio={false} videoConstraints={videoConstraints} height={height} width={width} style={style} />
-          <div
-            style={{
-              width: 30,
-              height: 30,
-              position: "absolute",
-              top: 15,
-              left: 15,
-              zIndex: 9999,
-            }}
-          >
-            <CloseButton closeAction={exitFullscreen} />
-          </div>
-          <div
-            style={{
-              width: 48,
-              height: 48,
-              position: "absolute",
-              bottom: 20,
-              left: horizontal ? "" : 20,
-              right: horizontal ? 20 : "",
-              zIndex: 9900,
-            }}
-          >
-            {!facingMode && devices.length > 1 && <ChangeDeviceButton changeDevice={nextDevice} />}
-          </div>
-          <div
-            style={{
-              width: 72,
-              height: 72,
-              position: "absolute",
-              bottom: horizontal ? "calc(50% - 36px)" : 8,
-              left: horizontal ? "" : "calc(50% - 36px)",
-              right: horizontal ? 8 : "",
-              zIndex: 9999,
-            }}
-          >
-            {<CaptureButton capture={capture} />}
-          </div>
-          <div
-            style={{
-              width: 48,
-              height: 48,
-              position: "absolute",
-              bottom: horizontal ? "" : 20,
-              top: horizontal ? 20 : "",
-              right: 20,
-              zIndex: 9900,
-            }}
-          >
-            {<MirrorButton mirrorAction={() => setUseMirror(!useMirror)} />}
-          </div>
+          <CloseButton closeAction={exitFullscreen} />
+          {!facingMode && devices.length > 1 && <ChangeDeviceButton changeDevice={nextDevice} horizontal={horizontal} />}
+          <CaptureButton capture={capture} horizontal={horizontal} />
+          <MirrorButton mirrorAction={() => setUseMirror(!useMirror)} horizontal={horizontal} />
         </>
       ) : (
-        <div
-          style={{
+        <Box
+          sx={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -401,11 +356,11 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
               alt="Foto capturada"
             />
           )}
-          <button
+          <Button
             onClick={startFullScreen}
             id="open-camera"
             disabled={devices === undefined || devices.length === 0}
-            style={{
+            sx={{
               padding: "1rem",
               color: "white",
               backgroundColor: "black",
@@ -414,11 +369,13 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
               boxShadow: "0 0 1rem rgba(0, 0, 0, 0.25)",
               textOverflow: "ellipsis",
               maxWidth: "80vw",
+              textTransform: "none",
+              fontSize: "1.5rem",
             }}
           >
             Iniciar cámara
-          </button>
-        </div>
+          </Button>
+        </Box>
       )}
     </>
   );
