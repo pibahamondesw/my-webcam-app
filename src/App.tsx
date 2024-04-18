@@ -1,6 +1,6 @@
-import "./App.css";
+import "./App.css"
 
-import WebcamComponent from "./components/WebcamComponent";
+import WebcamComponent from "./components/WebcamComponent"
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
     >
       <WebcamComponent />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

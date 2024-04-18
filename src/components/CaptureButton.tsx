@@ -1,8 +1,8 @@
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton } from "@mui/material"
 
 interface CaptureButtonProps {
-  capture: () => void;
-  horizontal: boolean;
+  capture: () => void
+  horizontal: boolean
 }
 
 const CaptureButton = ({ capture, horizontal }: CaptureButtonProps) => {
@@ -41,7 +41,7 @@ const CaptureButton = ({ capture, horizontal }: CaptureButtonProps) => {
         />
       </IconButton>
     </Box>
-  );
-};
+  )
+}
 
-export default CaptureButton;
+export default CaptureButton

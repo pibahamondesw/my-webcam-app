@@ -1,53 +1,53 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Webcam from "react-webcam";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import Webcam from "react-webcam"
 
-import { Box, Button } from "@mui/material";
+import { Box, Button } from "@mui/material"
 
-import CaptureButton from "./CaptureButton";
-import ChangeDeviceButton from "./ChangeDeviceButton";
-import CloseButton from "./CloseButton";
-import MirrorButton from "./MirrorButton";
+import CaptureButton from "./CaptureButton"
+import ChangeDeviceButton from "./ChangeDeviceButton"
+import CloseButton from "./CloseButton"
+import MirrorButton from "./MirrorButton"
 
 interface WebcamComponentProps {
-  facingMode?: "user" | "environment";
+  facingMode?: "user" | "environment"
 }
 
 const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
-  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isCameraActive, setIsCameraActive] = useState(false)
 
-  const [width, setWidth] = useState(window.innerWidth);
-  const [height, setHeight] = useState(window.innerHeight);
-  const [noCamera, setNoCamera] = useState<boolean | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [devices, setDevices] = useState<MediaDeviceInfo[] | null>(null);
-  const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
-  const [src, setSrc] = useState<string | null>(null);
-  const [horizontal, setHorizontal] = useState<boolean>(window.innerWidth >= window.innerHeight);
-  const [useMirror, setUseMirror] = useState<boolean>(facingMode === undefined || facingMode === "user");
+  const [width, setWidth] = useState(window.innerWidth)
+  const [height, setHeight] = useState(window.innerHeight)
+  const [noCamera, setNoCamera] = useState<boolean | null>(null)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [devices, setDevices] = useState<MediaDeviceInfo[] | null>(null)
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string>("")
+  const [src, setSrc] = useState<string | null>(null)
+  const [horizontal, setHorizontal] = useState<boolean>(window.innerWidth >= window.innerHeight)
+  const [useMirror, setUseMirror] = useState<boolean>(facingMode === undefined || facingMode === "user")
 
-  const webcamRef = useRef<Webcam | null>(null);
+  const webcamRef = useRef<Webcam | null>(null)
 
   useEffect(() => {
-    if (!webcamRef?.current?.video) return;
+    if (!webcamRef?.current?.video) return
 
     webcamRef.current.video.onloadeddata = () => {
-      width !== window.innerWidth && setWidth(window.innerWidth);
-      height !== window.innerHeight && setHeight(window.innerHeight);
-    };
-  }, [webcamRef?.current?.video, width, height]);
+      width !== window.innerWidth && setWidth(window.innerWidth)
+      height !== window.innerHeight && setHeight(window.innerHeight)
+    }
+  }, [webcamRef?.current?.video, width, height])
 
   // const [rotated, setRotated] = useState<boolean>(
   //   window.screen.orientation.angle == 90 || window.screen.orientation.angle == 270
   // );
 
   const capture = () => {
-    const imageSrc = webcamRef.current?.getScreenshot();
+    const imageSrc = webcamRef.current?.getScreenshot()
 
-    if (!imageSrc) return alert("No se pudo tomar la foto");
+    if (!imageSrc) return alert("No se pudo tomar la foto")
 
-    exitFullscreen();
-    setSrc("data:image/webp;base64," + imageSrc.substring(23));
-  };
+    exitFullscreen()
+    setSrc("data:image/webp;base64," + imageSrc.substring(23))
+  }
 
   const videoConstraints = useMemo(
     () =>
@@ -61,244 +61,244 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
         ...(facingMode && { facingMode: facingMode }),
       } as MediaTrackConstraints),
     [height, width, selectedDeviceId, facingMode]
-  );
+  )
 
   const orientationOnchange = useCallback(() => {
     window.navigator.mediaDevices
       .getUserMedia({ video: videoConstraints })
       .then(() => {
-        setWidth(window.innerWidth);
-        setHeight(window.innerHeight);
+        setWidth(window.innerWidth)
+        setHeight(window.innerHeight)
       })
-      .catch((err) => alert("Error:" + err));
-    setHorizontal(window.innerWidth >= window.innerHeight);
-  }, [videoConstraints]);
+      .catch((err) => alert("Error:" + err))
+    setHorizontal(window.innerWidth >= window.innerHeight)
+  }, [videoConstraints])
 
   window.onresize = () => {
     window.navigator.mediaDevices
       .getUserMedia({ video: videoConstraints })
       .then(() => {
-        setWidth(window.innerWidth);
-        setHeight(window.innerHeight);
+        setWidth(window.innerWidth)
+        setHeight(window.innerHeight)
       })
-      .catch((err) => alert("Error:" + err));
-    setHorizontal(window.innerWidth >= window.innerHeight);
-  };
+      .catch((err) => alert("Error:" + err))
+    setHorizontal(window.innerWidth >= window.innerHeight)
+  }
 
   const handleStartCamera = async () => {
     try {
       navigator.mediaDevices
         .getUserMedia({ video: videoConstraints })
         .then(() => setIsCameraActive(true))
-        .catch((err) => alert("Error:" + err));
+        .catch((err) => alert("Error:" + err))
     } catch (err) {
-      alert("Error accessing camera:" + err);
+      alert("Error accessing camera:" + err)
     }
-  };
+  }
 
   const goFullScreen = () => {
     const docElement = document.documentElement as HTMLElement & {
-      mozRequestFullScreen(): Promise<void>;
-      webkitRequestFullscreen(): Promise<void>;
-      webkitEnterFullScreen(): Promise<void>;
-      msRequestFullscreen(): Promise<void>;
-    };
+      mozRequestFullScreen(): Promise<void>
+      webkitRequestFullscreen(): Promise<void>
+      webkitEnterFullScreen(): Promise<void>
+      msRequestFullscreen(): Promise<void>
+    }
     if (docElement.requestFullscreen) {
       // W3C standard
-      docElement.requestFullscreen();
+      docElement.requestFullscreen()
     } else if (docElement.webkitRequestFullscreen) {
       // WebKit (Apple)
-      docElement.webkitRequestFullscreen();
+      docElement.webkitRequestFullscreen()
     } else if (docElement.mozRequestFullScreen) {
       // Mozilla (Firefox)
-      docElement.mozRequestFullScreen();
+      docElement.mozRequestFullScreen()
     } else if (docElement.msRequestFullscreen) {
       // Microsoft
-      docElement.msRequestFullscreen();
+      docElement.msRequestFullscreen()
     } else {
       const video = document.getElementsByTagName("video")[0] as HTMLVideoElement & {
-        mozRequestFullScreen(): Promise<void>;
-        webkitRequestFullscreen(): Promise<void>;
-        webkitEnterFullScreen(): Promise<void>;
-        msRequestFullscreen(): Promise<void>;
-      };
+        mozRequestFullScreen(): Promise<void>
+        webkitRequestFullscreen(): Promise<void>
+        webkitEnterFullScreen(): Promise<void>
+        msRequestFullscreen(): Promise<void>
+      }
       if (!video) {
-        alert("Fullscreen not supported");
-        return setIsFullscreen(false);
+        alert("Fullscreen not supported")
+        return setIsFullscreen(false)
       }
       if (video.requestFullscreen) {
         // WebKit (Apple)
-        video.requestFullscreen();
+        video.requestFullscreen()
       } else if (video.mozRequestFullScreen) {
         // Mozilla (Firefox)
-        video.mozRequestFullScreen();
+        video.mozRequestFullScreen()
       } else if (video.webkitRequestFullscreen) {
         // W3C standard
-        video.webkitRequestFullscreen();
+        video.webkitRequestFullscreen()
       } else if (video.webkitEnterFullScreen) {
         // W3C standard
-        video.webkitEnterFullScreen();
+        video.webkitEnterFullScreen()
       } else if (video.msRequestFullscreen) {
         // Microsoft
-        video.msRequestFullscreen();
+        video.msRequestFullscreen()
       } else {
-        alert("Fullscreen not supported");
-        return setIsFullscreen(false);
+        alert("Fullscreen not supported")
+        return setIsFullscreen(false)
       }
     }
-    setIsFullscreen(true);
-  };
+    setIsFullscreen(true)
+  }
 
   const exitFullScreen = () => {
     if (document.exitFullscreen) {
       // W3C standard
-      document.exitFullscreen();
+      document.exitFullscreen()
     } else if (
       (
         document as unknown as {
-          webkitExitFullscreen(): Promise<void>;
+          webkitExitFullscreen(): Promise<void>
         }
       ).webkitExitFullscreen
     ) {
       // WebKit (Apple)
-      (
+      ;(
         document as unknown as {
-          webkitExitFullscreen(): Promise<void>;
+          webkitExitFullscreen(): Promise<void>
         }
-      ).webkitExitFullscreen();
+      ).webkitExitFullscreen()
     } else if (
       (
         document as unknown as {
-          mozCancelFullScreen(): Promise<void>;
+          mozCancelFullScreen(): Promise<void>
         }
       ).mozCancelFullScreen
     ) {
       // Mozilla (Firefox)
-      (
+      ;(
         document as unknown as {
-          mozCancelFullScreen(): Promise<void>;
+          mozCancelFullScreen(): Promise<void>
         }
-      ).mozCancelFullScreen();
+      ).mozCancelFullScreen()
     } else if (
       (
         document as unknown as {
-          msExitFullscreen(): Promise<void>;
+          msExitFullscreen(): Promise<void>
         }
       ).msExitFullscreen
     ) {
       // Microsoft
-      (
+      ;(
         document as unknown as {
-          msExitFullscreen(): Promise<void>;
+          msExitFullscreen(): Promise<void>
         }
-      ).msExitFullscreen();
+      ).msExitFullscreen()
     } else {
       const videoElement = document.getElementsByTagName("video")[0] as HTMLVideoElement & {
-        exitFullscreen(): Promise<void>;
-        mozCancelFullScreen(): Promise<void>;
-        webkitExitFullscreen(): Promise<void>;
-        webkitExitFullScreen(): Promise<void>;
-        msExitFullscreen(): Promise<void>;
-      };
+        exitFullscreen(): Promise<void>
+        mozCancelFullScreen(): Promise<void>
+        webkitExitFullscreen(): Promise<void>
+        webkitExitFullScreen(): Promise<void>
+        msExitFullscreen(): Promise<void>
+      }
       if (!videoElement) {
-        alert("Fullscreen not supported");
-        return setIsFullscreen(false);
+        alert("Fullscreen not supported")
+        return setIsFullscreen(false)
       }
       if (videoElement.exitFullscreen) {
         // WebKit (Apple)
-        videoElement.exitFullscreen();
+        videoElement.exitFullscreen()
       } else if (videoElement.mozCancelFullScreen) {
         // Mozilla (Firefox)
-        videoElement.mozCancelFullScreen();
+        videoElement.mozCancelFullScreen()
       } else if (videoElement.webkitExitFullscreen) {
         // W3C standard
-        videoElement.webkitExitFullscreen();
+        videoElement.webkitExitFullscreen()
       } else if (videoElement.webkitExitFullScreen) {
         // W3C standard
-        videoElement.webkitExitFullScreen();
+        videoElement.webkitExitFullScreen()
       } else if (videoElement.msExitFullscreen) {
         // Microsoft
-        videoElement.msExitFullscreen();
+        videoElement.msExitFullscreen()
       } else {
-        alert("Fullscreen not supported");
+        alert("Fullscreen not supported")
       }
     }
-    setIsFullscreen(false);
-  };
+    setIsFullscreen(false)
+  }
 
   const startFullScreen = () => {
-    handleStartCamera();
-    goFullScreen();
-  };
+    handleStartCamera()
+    goFullScreen()
+  }
 
   const isInFullScreen = () => {
     const doc = document as Document & {
-      fullscreenElement: Element;
-      webkitFullscreenElement: Element;
-      mozFullScreenElement: Element;
-      msFullscreenElement: Element;
-    };
-    return doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
-  };
+      fullscreenElement: Element
+      webkitFullscreenElement: Element
+      mozFullScreenElement: Element
+      msFullscreenElement: Element
+    }
+    return doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement
+  }
 
   const exitFullscreen = useCallback(() => {
-    isInFullScreen() && exitFullScreen();
-    isFullscreen && setIsFullscreen(false);
-    setIsCameraActive(false);
-  }, [isFullscreen]);
+    isInFullScreen() && exitFullScreen()
+    isFullscreen && setIsFullscreen(false)
+    setIsCameraActive(false)
+  }, [isFullscreen])
 
   useEffect(() => {
-    if (devices != null) return;
+    if (devices != null) return
 
     const getDevices = async () => {
       try {
-        await navigator.mediaDevices.getUserMedia({ video: true, ...(facingMode && { facingMode: facingMode }) });
+        await navigator.mediaDevices.getUserMedia({ video: true, ...(facingMode && { facingMode: facingMode }) })
         try {
-          const mediaDevices = await navigator.mediaDevices.enumerateDevices();
-          setDevices(mediaDevices.filter((device) => device.deviceId !== "" && device.kind === "videoinput"));
+          const mediaDevices = await navigator.mediaDevices.enumerateDevices()
+          setDevices(mediaDevices.filter((device) => device.deviceId !== "" && device.kind === "videoinput"))
         } catch {
-          setDevices([]);
+          setDevices([])
         }
       } catch {
-        setNoCamera(true);
+        setNoCamera(true)
       }
-    };
+    }
 
-    getDevices();
-  }, [devices, facingMode]);
+    getDevices()
+  }, [devices, facingMode])
 
   useEffect(() => {
-    if (devices === null || devices.length === 0) return;
+    if (devices === null || devices.length === 0) return
 
-    setSelectedDeviceId(devices[0].deviceId);
-  }, [devices]);
+    setSelectedDeviceId(devices[0].deviceId)
+  }, [devices])
 
   const nextDevice = () => {
-    if (devices === null || devices.length === 0) return;
+    if (devices === null || devices.length === 0) return
 
-    const index = devices.findIndex((device) => device.deviceId === selectedDeviceId);
+    const index = devices.findIndex((device) => device.deviceId === selectedDeviceId)
 
-    if (index === -1) return setSelectedDeviceId(devices[0].deviceId);
-    setSelectedDeviceId(devices[(index + 1) % devices.length].deviceId);
-  };
+    if (index === -1) return setSelectedDeviceId(devices[0].deviceId)
+    setSelectedDeviceId(devices[(index + 1) % devices.length].deviceId)
+  }
 
   useEffect(() => {
-    if (!selectedDeviceId) return;
+    if (!selectedDeviceId) return
 
     window.navigator.mediaDevices
       .getUserMedia({ video: videoConstraints })
       .then(() => setNoCamera(false))
-      .catch(() => setNoCamera(true));
+      .catch(() => setNoCamera(true))
 
     // Exit fullscreen on change
     document.onfullscreenchange = () => {
-      if (!document.fullscreenElement) exitFullscreen();
-    };
+      if (!document.fullscreenElement) exitFullscreen()
+    }
 
     if (window.screen.orientation) {
-      window.screen.orientation.onchange = orientationOnchange;
+      window.screen.orientation.onchange = orientationOnchange
     }
-  }, [selectedDeviceId, videoConstraints, exitFullscreen, orientationOnchange]);
+  }, [selectedDeviceId, videoConstraints, exitFullscreen, orientationOnchange])
 
   const style = useMemo(
     () => ({
@@ -315,7 +315,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
       ...(isFullscreen && { zIndex: 9900 }), // Set a higher z-index for fullscreen
     }),
     [height, width, isFullscreen, useMirror]
-  );
+  )
 
   return noCamera ? (
     <>
@@ -378,7 +378,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
         </Box>
       )}
     </>
-  );
-};
+  )
+}
 
-export default WebcamComponent;
+export default WebcamComponent

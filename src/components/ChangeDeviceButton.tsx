@@ -1,8 +1,8 @@
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton } from "@mui/material"
 
 interface ChangeDeviceButtonProps {
-  changeDevice: () => void;
-  horizontal: boolean;
+  changeDevice: () => void
+  horizontal: boolean
 }
 
 const ChangeDeviceButton = ({ changeDevice, horizontal }: ChangeDeviceButtonProps) => {
@@ -38,7 +38,7 @@ const ChangeDeviceButton = ({ changeDevice, horizontal }: ChangeDeviceButtonProp
         </svg>
       </IconButton>
     </Box>
-  );
-};
+  )
+}
 
-export default ChangeDeviceButton;
+export default ChangeDeviceButton

@@ -1,7 +1,7 @@
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton } from "@mui/material"
 
 interface CloseButtonProps {
-  closeAction: () => void;
+  closeAction: () => void
 }
 
 const CloseButton = ({ closeAction }: CloseButtonProps) => {
@@ -35,7 +35,7 @@ const CloseButton = ({ closeAction }: CloseButtonProps) => {
         </svg>
       </IconButton>
     </Box>
-  );
-};
+  )
+}
 
-export default CloseButton;
+export default CloseButton

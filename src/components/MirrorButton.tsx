@@ -1,12 +1,12 @@
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton } from "@mui/material"
 
 interface MirrorButtonProps {
-  mirrorAction: () => void;
-  horizontal: boolean;
+  mirrorAction: () => void
+  horizontal: boolean
 }
 
 const MirrorButton = ({ mirrorAction, horizontal }: MirrorButtonProps) => {
-  const buttonSize = 48;
+  const buttonSize = 48
   return (
     <Box
       style={{
@@ -54,7 +54,7 @@ const MirrorButton = ({ mirrorAction, horizontal }: MirrorButtonProps) => {
         </svg>
       </IconButton>
     </Box>
-  );
-};
+  )
+}
 
-export default MirrorButton;
+export default MirrorButton
