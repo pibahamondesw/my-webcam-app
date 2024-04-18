@@ -361,7 +361,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
             id="open-camera"
             disabled={devices === undefined || devices.length === 0}
             sx={{
-              padding: "1rem",
+              padding: "1.5rem",
               color: "white",
               backgroundColor: "black",
               border: "0 solid black",
