@@ -103,19 +103,11 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
       webkitEnterFullScreen(): Promise<void>
       msRequestFullscreen(): Promise<void>
     }
-    if (docElement.requestFullscreen) {
-      // W3C standard
-      docElement.requestFullscreen()
-    } else if (docElement.webkitRequestFullscreen) {
-      // WebKit (Apple)
-      docElement.webkitRequestFullscreen()
-    } else if (docElement.mozRequestFullScreen) {
-      // Mozilla (Firefox)
-      docElement.mozRequestFullScreen()
-    } else if (docElement.msRequestFullscreen) {
-      // Microsoft
-      docElement.msRequestFullscreen()
-    } else {
+    if (docElement.requestFullscreen) docElement.requestFullscreen() // W3C standard
+    else if (docElement.webkitRequestFullscreen) docElement.webkitRequestFullscreen() // WebKit (Apple)
+    else if (docElement.mozRequestFullScreen) docElement.mozRequestFullScreen() // Mozilla (Firefox)
+    else if (docElement.msRequestFullscreen) docElement.msRequestFullscreen() // Microsoft
+    else {
       const video = document.getElementsByTagName("video")[0] as HTMLVideoElement & {
         mozRequestFullScreen(): Promise<void>
         webkitRequestFullscreen(): Promise<void>
@@ -126,22 +118,12 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
         alert("Fullscreen not supported")
         return setIsFullscreen(false)
       }
-      if (video.requestFullscreen) {
-        // WebKit (Apple)
-        video.requestFullscreen()
-      } else if (video.mozRequestFullScreen) {
-        // Mozilla (Firefox)
-        video.mozRequestFullScreen()
-      } else if (video.webkitRequestFullscreen) {
-        // W3C standard
-        video.webkitRequestFullscreen()
-      } else if (video.webkitEnterFullScreen) {
-        // W3C standard
-        video.webkitEnterFullScreen()
-      } else if (video.msRequestFullscreen) {
-        // Microsoft
-        video.msRequestFullscreen()
-      } else {
+      if (video.requestFullscreen) video.requestFullscreen() // W3C standard
+      else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen() // WebKit (Apple)
+      else if (video.webkitEnterFullScreen) video.webkitEnterFullScreen() // WebKit (Apple)
+      else if (video.mozRequestFullScreen) video.mozRequestFullScreen() // Mozilla (Firefox)
+      else if (video.msRequestFullscreen) video.msRequestFullscreen() // Microsoft
+      else {
         alert("Fullscreen not supported")
         return setIsFullscreen(false)
       }
@@ -150,78 +132,31 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   }
 
   const exitFullScreen = () => {
-    if (document.exitFullscreen) {
-      // W3C standard
-      document.exitFullscreen()
-    } else if (
-      (
-        document as unknown as {
-          webkitExitFullscreen(): Promise<void>
-        }
-      ).webkitExitFullscreen
-    ) {
-      // WebKit (Apple)
-      ;(
-        document as unknown as {
-          webkitExitFullscreen(): Promise<void>
-        }
-      ).webkitExitFullscreen()
-    } else if (
-      (
-        document as unknown as {
-          mozCancelFullScreen(): Promise<void>
-        }
-      ).mozCancelFullScreen
-    ) {
-      // Mozilla (Firefox)
-      ;(
-        document as unknown as {
-          mozCancelFullScreen(): Promise<void>
-        }
-      ).mozCancelFullScreen()
-    } else if (
-      (
-        document as unknown as {
-          msExitFullscreen(): Promise<void>
-        }
-      ).msExitFullscreen
-    ) {
-      // Microsoft
-      ;(
-        document as unknown as {
-          msExitFullscreen(): Promise<void>
-        }
-      ).msExitFullscreen()
-    } else {
+    const doc = document as Document & {
+      webkitExitFullscreen(): Promise<void>
+      mozCancelFullScreen(): Promise<void>
+      msExitFullscreen(): Promise<void>
+    }
+    if (doc.exitFullscreen) doc.exitFullscreen() // W3C standard
+    else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen() // WebKit (Apple)
+    else if (doc.mozCancelFullScreen) doc.mozCancelFullScreen() // Mozilla (Firefox)
+    else if (doc.msExitFullscreen) doc.msExitFullscreen() // Microsoft
+    else {
       const videoElement = document.getElementsByTagName("video")[0] as HTMLVideoElement & {
         exitFullscreen(): Promise<void>
         mozCancelFullScreen(): Promise<void>
         webkitExitFullscreen(): Promise<void>
-        webkitExitFullScreen(): Promise<void>
         msExitFullscreen(): Promise<void>
       }
       if (!videoElement) {
         alert("Fullscreen not supported")
         return setIsFullscreen(false)
       }
-      if (videoElement.exitFullscreen) {
-        // WebKit (Apple)
-        videoElement.exitFullscreen()
-      } else if (videoElement.mozCancelFullScreen) {
-        // Mozilla (Firefox)
-        videoElement.mozCancelFullScreen()
-      } else if (videoElement.webkitExitFullscreen) {
-        // W3C standard
-        videoElement.webkitExitFullscreen()
-      } else if (videoElement.webkitExitFullScreen) {
-        // W3C standard
-        videoElement.webkitExitFullScreen()
-      } else if (videoElement.msExitFullscreen) {
-        // Microsoft
-        videoElement.msExitFullscreen()
-      } else {
-        alert("Fullscreen not supported")
-      }
+      if (videoElement.exitFullscreen) videoElement.exitFullscreen() // W3C standard
+      else if (videoElement.webkitExitFullscreen) videoElement.webkitExitFullscreen() // WebKit (Apple)
+      else if (videoElement.mozCancelFullScreen) videoElement.mozCancelFullScreen() // Mozilla (Firefox)
+      else if (videoElement.msExitFullscreen) videoElement.msExitFullscreen() // Microsoft
+      else alert("Fullscreen not supported")
     }
     setIsFullscreen(false)
   }
