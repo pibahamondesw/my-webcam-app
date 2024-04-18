@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Webcam from "react-webcam"
 
-import { Box, Button } from "@mui/material"
+import { Alert, Box, Button, CircularProgress } from "@mui/material"
 
 import CaptureButton from "./CaptureButton"
 import ChangeDeviceButton from "./ChangeDeviceButton"
@@ -253,13 +253,17 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   )
 
   return noCamera ? (
-    <>
-      <h1 style={{ color: "red" }}>Asegúrese de entregarle permisos a la cámara</h1>
-    </>
+    <Alert severity="error" sx={{ boxShadow: "0 0 1rem rgba(0, 0, 0, 0.25)" }}>
+      Asegúrese de entregarle permisos a la cámara
+    </Alert>
   ) : devices === null ? (
-    <></>
+    <Box width={100} color="white">
+      <CircularProgress color="inherit" />
+    </Box>
   ) : devices.length === 0 ? (
-    <h1 style={{ color: "red" }}>No se han encontrado cámaras en este dispositivo</h1>
+    <Alert severity="error" sx={{ boxShadow: "0 0 1rem rgba(0, 0, 0, 0.25)" }}>
+      No se han encontrado cámaras en este dispositivo
+    </Alert>
   ) : (
     <>
       {isCameraActive ? (
