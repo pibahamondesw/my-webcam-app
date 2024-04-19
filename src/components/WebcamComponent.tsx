@@ -333,7 +333,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
               p: "1.5rem",
               m: 3,
               color: "white",
-              bgcolor: "rgba(0, 0, 0, 0.35)",
+              bgcolor: "rgba(0, 0, 0, 0.5)",
               border: "0 solid black",
               borderRadius: "1rem",
               boxShadow: selectedDeviceId ? "0 0 1rem rgba(0, 0, 0, 0.25)" : "",
@@ -341,6 +341,9 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
               maxWidth: "80vw",
               textTransform: "none",
               fontSize: "1.5rem",
+              "&:hover": {
+                bgcolor: "rgba(0, 0, 0, 0.75)",
+              },
             }}
           >
             Iniciar cámara
