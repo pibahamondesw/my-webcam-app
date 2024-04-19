@@ -29,14 +29,7 @@ const CaptureButton = ({ capture, horizontal }: CaptureButtonProps) => {
           backgroundColor: "rgba(0, 0, 0, 0.3)",
         }}
       >
-        <Box
-          sx={{
-            backgroundColor: "rgba(255, 255, 255, 0.75)",
-            width: (2 * buttonSize) / 3,
-            height: (2 * buttonSize) / 3,
-            borderRadius: buttonSize / 3,
-          }}
-        />
+        <Box bgcolor="rgba(255, 255, 255, 0.75)" width={(2 * buttonSize) / 3} height={(2 * buttonSize) / 3} borderRadius={buttonSize / 3} />
       </IconButton>
     </Box>
   )
