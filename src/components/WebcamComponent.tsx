@@ -164,11 +164,11 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     return doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement
   }
 
-  const exitFullscreen = useCallback(() => {
+  const exitFullscreen = () => {
     isInFullScreen() && exitFullScreen()
-    isFullscreen && setIsFullscreen(false)
+    setIsFullscreen(false)
     setIsCameraActive(false)
-  }, [isFullscreen])
+  }
 
   useEffect(() => {
     if (devices != null) return
@@ -213,12 +213,13 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
       .catch(() => setNoCamera(true))
 
     // Exit fullscreen on change
-    document.onfullscreenchange = () => !isInFullScreen() && exitFullscreen()
 
     if (window.screen.orientation) {
       window.screen.orientation.onchange = updateSizes
     }
-  }, [selectedDeviceId, videoConstraints, exitFullscreen, updateSizes])
+  }, [selectedDeviceId, videoConstraints, updateSizes])
+
+  document.onfullscreenchange = () => !isInFullScreen() && exitFullscreen()
 
   const style = useMemo(
     () => ({
