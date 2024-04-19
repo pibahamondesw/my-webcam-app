@@ -188,7 +188,6 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
           const mediaDevices = await navigator.mediaDevices.enumerateDevices()
           const videoDevices = mediaDevices.filter((device) => device.deviceId !== "" && device.kind === "videoinput")
           setDevices(videoDevices)
-          alert(videoDevices.map((device) => `${device.label}`).join(", "))
           if (videoDevices.length === 0) return setNoCamera(true)
 
           setSelectedDeviceId(videoDevices[0].deviceId)
