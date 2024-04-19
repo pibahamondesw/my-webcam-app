@@ -16,6 +16,7 @@ function App() {
       display="flex"
       justifyContent="center"
       bgcolor="darkcyan"
+      color="white"
     >
       <WebcamComponent />
     </Box>
