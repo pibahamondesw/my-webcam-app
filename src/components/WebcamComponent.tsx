@@ -176,7 +176,37 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
 
         try {
           const mediaDevices = await navigator.mediaDevices.enumerateDevices()
-          const videoDevices = mediaDevices.filter((device) => device.deviceId !== "" && device.kind === "videoinput")
+          let videoDevices = mediaDevices.filter((device) => device.deviceId !== "" && device.kind === "videoinput")
+          if (videoDevices.length > 2) {
+            // Keep one environment and one user or the first two
+            const user = videoDevices.find((device) => {
+              const capabilities = (device as InputDeviceInfo).getCapabilities()
+              return (
+                capabilities.facingMode?.includes("user") ||
+                device.label.toLowerCase().includes("front") ||
+                device.label.toLowerCase().includes("user") ||
+                device.label.toLowerCase().includes("selfie") ||
+                device.label.toLowerCase().includes("frontal") ||
+                device.label.toLowerCase().includes("face") ||
+                ((capabilities.facingMode?.length === 0 && capabilities.height?.max) || 0) > (capabilities.width?.max || 0)
+              )
+            })
+            const environment = videoDevices.find((device) => {
+              const capabilities = (device as InputDeviceInfo).getCapabilities()
+              return (
+                capabilities.facingMode?.includes("environment") ||
+                device.label.toLowerCase().includes("back") ||
+                device.label.toLowerCase().includes("environment") ||
+                device.label.toLowerCase().includes("rear") ||
+                device.label.toLowerCase().includes("world") ||
+                device.label.toLowerCase().includes("posterior") ||
+                ((capabilities.facingMode?.length === 0 && capabilities.width?.max) || 0) > (capabilities.height?.max || 0)
+              )
+            })
+            if (user && environment) videoDevices = [user, environment]
+            else videoDevices = videoDevices.slice(0, 2)
+          }
+
           setDevices(videoDevices)
           if (videoDevices.length === 0) return setNoCamera(true)
 
