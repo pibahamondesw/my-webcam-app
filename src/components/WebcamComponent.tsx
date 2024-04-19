@@ -205,6 +205,21 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   }
 
   useEffect(() => {
+    if (stream) return
+
+    if (selectedDeviceId) {
+      navigator.mediaDevices.getUserMedia({ video: videoConstraints }).then((stream) => setStream(stream))
+    }
+  }, [stream, selectedDeviceId, videoConstraints])
+
+  useEffect(() => {
+    if (!stream) return
+
+    const expectedFacingMode = stream.getTracks()[0].getSettings().facingMode
+    setUseMirror(expectedFacingMode !== "environment")
+  }, [stream, selectedDeviceId])
+
+  useEffect(() => {
     if (window.screen.orientation) window.screen.orientation.onchange = updateSizes
     window.onresize = updateSizes
   }, [updateSizes])
@@ -261,11 +276,6 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
             width={isMobile ? width : 0.6 * width}
             style={style}
           />
-          {/* {stream && (
-            <Typography position="absolute" top={0} color="white" bgcolor="black" zIndex={9999}>
-              {stream.getTracks()[0].getCapabilities().facingMode?.toString()}
-            </Typography>
-          )} */}
           <CloseButton closeAction={exitFullscreen} mobile={isMobile} />
           {!facingMode && devices.length > 0 && <ChangeDeviceButton changeDevice={nextDevice} horizontal={horizontal} mobile={isMobile} />}
           <CaptureButton capture={capture} horizontal={horizontal} mobile={isMobile} />
