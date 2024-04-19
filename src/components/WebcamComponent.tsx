@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Webcam from "react-webcam"
 
+import { VideocamOff } from "@mui/icons-material"
 import { Alert, Box, Button, CircularProgress } from "@mui/material"
 
 import CaptureButton from "./CaptureButton"
@@ -242,7 +243,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   )
 
   return noCamera ? (
-    <Alert severity="error" sx={{ boxShadow: "0 0 1rem rgba(0, 0, 0, 0.25)" }}>
+    <Alert icon={<VideocamOff />} severity="error" sx={{ boxShadow: "0 0 1rem rgba(0, 0, 0, 0.25)" }}>
       Asegúrese de entregarle permisos a la cámara
     </Alert>
   ) : devices === null ? (
@@ -250,7 +251,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
       <CircularProgress color="inherit" />
     </Box>
   ) : devices.length === 0 ? (
-    <Alert severity="error" sx={{ boxShadow: "0 0 1rem rgba(0, 0, 0, 0.25)" }}>
+    <Alert icon={<VideocamOff />} severity="error" sx={{ boxShadow: "0 0 1rem rgba(0, 0, 0, 0.25)" }}>
       No se han encontrado cámaras en este dispositivo
     </Alert>
   ) : (
