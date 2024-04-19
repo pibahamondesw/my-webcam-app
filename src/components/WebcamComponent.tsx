@@ -14,25 +14,29 @@ interface WebcamComponentProps {
 }
 
 const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
-  const [width, setWidth] = useState(window.innerWidth)
-  const [height, setHeight] = useState(window.innerHeight)
+  const [width, setWidth] = useState(Math.min(window.innerWidth, window.outerWidth))
+  const [height, setHeight] = useState(Math.min(window.innerHeight, window.outerHeight))
   const [noCamera, setNoCamera] = useState<boolean | null>(null)
   const [isCameraActive, setIsCameraActive] = useState(false)
   const [devices, setDevices] = useState<MediaDeviceInfo[] | null>(null)
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("")
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [src, setSrc] = useState<string | null>(null)
-  const [horizontal, setHorizontal] = useState<boolean>(window.innerWidth >= window.innerHeight)
+  const [horizontal, setHorizontal] = useState<boolean>(
+    Math.min(window.innerWidth, window.outerWidth) >= Math.min(window.innerHeight, window.outerHeight)
+  )
   const [useMirror, setUseMirror] = useState<boolean>(facingMode === undefined || facingMode === "user")
-  const [isMobile, setIsMobile] = useState<boolean>(window.innerHeight < 600 || window.innerWidth < 600)
+  const [isMobile, setIsMobile] = useState<boolean>(
+    Math.min(window.innerHeight, window.outerHeight) < 600 || Math.min(window.innerWidth, window.outerWidth) < 600
+  )
 
   const webcamRef = useRef<Webcam | null>(null)
 
   const updateSizes = useCallback(() => {
-    setWidth(window.innerWidth)
-    setHeight(window.innerHeight)
-    setHorizontal(window.innerWidth >= window.innerHeight)
-    setIsMobile(window.innerHeight < 600 || window.innerWidth < 600)
+    setWidth(Math.min(window.innerWidth, window.outerWidth))
+    setHeight(Math.min(window.innerHeight, window.outerHeight))
+    setHorizontal(Math.min(window.innerWidth, window.outerWidth) >= Math.min(window.innerHeight, window.outerHeight))
+    setIsMobile(Math.min(window.innerHeight, window.outerHeight) < 600 || Math.min(window.innerWidth, window.outerWidth) < 600)
   }, [])
 
   useEffect(() => {
@@ -49,7 +53,6 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     if (!imageSrc) return alert("No se pudo tomar la foto")
 
     exitFullscreen()
-    exitStream()
     setSrc("data:image/png;base64," + imageSrc.substring(23))
   }
 
@@ -148,7 +151,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
 
   const startFullScreen = () => {
     handleStartCamera()
-    goFullScreen()
+    isMobile && goFullScreen()
   }
 
   const exitFullscreen = () => {
@@ -210,21 +213,30 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   const style = useMemo(
     () => ({
       position: "absolute" as "absolute",
-      top: 0,
-      left: 0,
-      height: height,
-      width: width,
-      backgroundColor: "black",
+      top: isMobile ? 0 : 0.2 * height,
+      left: isMobile ? 0 : 0.2 * width,
+      height: isMobile ? height : 0.6 * height,
+      width: isMobile ? width : 0.6 * width,
+      borderRadius: isMobile ? 0 : "1rem",
+      backgroundColor: isMobile ? "black" : "transparent",
       objectFit: "cover" as "cover",
       aspectRatio: `${((width * 1.0) / height) * 1.0}`,
       display: "block",
       transform: useMirror ? "scaleX(-1) " : "",
       zIndex: 9900,
     }),
-    [height, width, useMirror]
+    [isMobile, height, width, useMirror]
   )
 
-  console.log("isMobile:", isMobile)
+  console.log(stream)
+
+  const otherStyle = () => ({
+    bgcolor: "rgba(255, 255, 255, 0.5)",
+    height: height,
+    width: width,
+  })
+
+  console.log(otherStyle())
 
   return noCamera ? (
     <Alert icon={<VideocamOff />} severity="error" sx={{ boxShadow: "0 0 1rem rgba(0, 0, 0, 0.25)" }}>
@@ -241,12 +253,24 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   ) : (
     <>
       {isCameraActive ? (
-        <Box id="webcam-interface">
-          <Webcam ref={webcamRef} audio={false} videoConstraints={videoConstraints} height={height} width={width} style={style} />
-          <CloseButton closeAction={exitFullscreen} />
-          {!facingMode && devices.length > 1 && <ChangeDeviceButton changeDevice={nextDevice} horizontal={horizontal} />}
-          <CaptureButton capture={capture} horizontal={horizontal} />
-          <MirrorButton mirrorAction={() => setUseMirror(!useMirror)} horizontal={horizontal} />
+        <Box id="webcam-interface" style={otherStyle()}>
+          <Webcam
+            ref={webcamRef}
+            audio={false}
+            videoConstraints={videoConstraints}
+            height={isMobile ? height : 0.6 * height}
+            width={isMobile ? width : 0.6 * width}
+            style={style}
+          />
+          {/* {stream && (
+            <Typography position="absolute" top={0} color="white" bgcolor="black" zIndex={9999}>
+              {stream.getTracks()[0].getCapabilities().facingMode?.toString()}
+            </Typography>
+          )} */}
+          <CloseButton closeAction={exitFullscreen} mobile={isMobile} />
+          {!facingMode && devices.length > 1 && <ChangeDeviceButton changeDevice={nextDevice} horizontal={horizontal} mobile={isMobile} />}
+          <CaptureButton capture={capture} horizontal={horizontal} mobile={isMobile} />
+          <MirrorButton mirrorAction={() => setUseMirror(!useMirror)} horizontal={horizontal} mobile={isMobile} />
         </Box>
       ) : (
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" gap="1rem" my={3}>
