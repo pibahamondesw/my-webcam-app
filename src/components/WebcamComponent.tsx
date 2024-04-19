@@ -13,13 +13,16 @@ interface WebcamComponentProps {
   facingMode?: "user" | "environment"
 }
 
+interface AuxMediaDeviceInfo extends MediaDeviceInfo {
+  getCapabilities?: () => { facingMode: string; height: { max: number }; width: { max: number } }
+}
+
 const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   const [width, setWidth] = useState(Math.min(window.innerWidth, window.screen.width))
   const [height, setHeight] = useState(Math.min(window.innerHeight, window.screen.height))
-  const [noCamera, setNoCamera] = useState<boolean | null>(null)
   const [isCameraActive, setIsCameraActive] = useState(false)
   const [devices, setDevices] = useState<MediaDeviceInfo[] | null>(null)
-  const [selectedDeviceId, setSelectedDeviceId] = useState<string>("")
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null)
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [src, setSrc] = useState<string | null>(null)
   const [horizontal, setHorizontal] = useState<boolean>(
@@ -180,27 +183,31 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
           if (videoDevices.length > 2) {
             // Keep one environment and one user or the first two
             const user = videoDevices.find((device) => {
-              const capabilities = (device as InputDeviceInfo).getCapabilities()
+              const auxDevice = device as AuxMediaDeviceInfo
+              const capabilities = auxDevice.getCapabilities && auxDevice.getCapabilities()
               return (
-                capabilities.facingMode?.includes("user") ||
+                capabilities?.facingMode?.includes("user") ||
                 device.label.toLowerCase().includes("front") ||
                 device.label.toLowerCase().includes("user") ||
                 device.label.toLowerCase().includes("selfie") ||
                 device.label.toLowerCase().includes("frontal") ||
                 device.label.toLowerCase().includes("face") ||
-                ((capabilities.facingMode?.length === 0 && capabilities.height?.max) || 0) > (capabilities.width?.max || 0)
+                (capabilities &&
+                  ((capabilities.facingMode?.length === 0 && capabilities.height?.max) || 0) > (capabilities.width?.max || 0))
               )
             })
             const environment = videoDevices.find((device) => {
-              const capabilities = (device as InputDeviceInfo).getCapabilities()
+              const auxDevice = device as AuxMediaDeviceInfo
+              const capabilities = auxDevice.getCapabilities && auxDevice.getCapabilities()
               return (
-                capabilities.facingMode?.includes("environment") ||
+                capabilities?.facingMode?.includes("environment") ||
                 device.label.toLowerCase().includes("back") ||
                 device.label.toLowerCase().includes("environment") ||
                 device.label.toLowerCase().includes("rear") ||
                 device.label.toLowerCase().includes("world") ||
                 device.label.toLowerCase().includes("posterior") ||
-                ((capabilities.facingMode?.length === 0 && capabilities.width?.max) || 0) > (capabilities.height?.max || 0)
+                (capabilities &&
+                  ((capabilities.facingMode?.length === 0 && capabilities.width?.max) || 0) > (capabilities.height?.max || 0))
               )
             })
             if (user && environment) videoDevices = [user, environment]
@@ -208,7 +215,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
           }
 
           setDevices(videoDevices)
-          if (videoDevices.length === 0) return setNoCamera(true)
+          if (videoDevices.length === 0) return setSelectedDeviceId("")
 
           setSelectedDeviceId(videoDevices[0].deviceId)
         } catch {
@@ -216,7 +223,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
         }
       } catch (e) {
         alert(e)
-        setNoCamera(true)
+        setSelectedDeviceId("")
       }
     }
 
@@ -282,7 +289,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     [height, width]
   )
 
-  return noCamera ? (
+  return selectedDeviceId === "" ? (
     <Alert icon={<VideocamOff />} severity="error" sx={{ boxShadow: "0 0 1rem rgba(0, 0, 0, 0.25)" }}>
       Asegúrese de entregarle permisos a la cámara
     </Alert>
