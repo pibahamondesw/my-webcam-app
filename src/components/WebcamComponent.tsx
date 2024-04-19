@@ -154,7 +154,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
 
   const startFullScreen = () => {
     handleStartCamera()
-    isMobile && goFullScreen()
+    goFullScreen()
   }
 
   const exitFullscreen = () => {
