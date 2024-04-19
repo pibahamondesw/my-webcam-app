@@ -50,7 +50,7 @@ const CaptureButton = ({ capture, horizontal, mobile }: CaptureButtonProps) => {
         onClick={capture}
       >
         <Stack spacing={1} direction="column" alignItems="center">
-          <CameraAlt sx={{ fontSize: 75 }} />
+          <CameraAlt sx={{ fontSize: 70 }} />
           <Typography fontSize="small">Tomar foto</Typography>
         </Stack>
       </Button>

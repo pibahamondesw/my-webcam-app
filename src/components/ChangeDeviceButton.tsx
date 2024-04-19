@@ -53,9 +53,9 @@ const ChangeDeviceButton = ({ changeDevice, horizontal, mobile }: ChangeDeviceBu
         }}
         onClick={changeDevice}
       >
-        <Stack spacing={0} direction="column" alignItems="center">
+        <Stack spacing={0.5} direction="column" alignItems="center">
           <ChangeDeviceSvg size={48} />
-          <Typography fontSize="x-small" textTransform="none">
+          <Typography fontSize="small" textTransform="none">
             Cambiar
           </Typography>
         </Stack>
