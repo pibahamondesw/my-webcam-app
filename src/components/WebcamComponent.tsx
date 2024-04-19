@@ -289,6 +289,9 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     [height, width]
   )
 
+  // Exit on escape
+  document.onkeydown = (e) => e.key === "Escape" && exitFullscreen()
+
   return selectedDeviceId === "" ? (
     <Alert icon={<VideocamOff />} severity="error" sx={{ boxShadow: "0 0 1rem rgba(0, 0, 0, 0.25)" }}>
       Asegúrese de entregarle permisos a la cámara
