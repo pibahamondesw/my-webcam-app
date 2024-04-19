@@ -25,6 +25,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   const [src, setSrc] = useState<string | null>(null)
   const [horizontal, setHorizontal] = useState<boolean>(window.innerWidth >= window.innerHeight)
   const [useMirror, setUseMirror] = useState<boolean>(facingMode === undefined || facingMode === "user")
+  const [stream, setStream] = useState<MediaStream | null>(null)
 
   const webcamRef = useRef<Webcam | null>(null)
 
@@ -50,7 +51,8 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     if (!imageSrc) return alert("No se pudo tomar la foto")
 
     exitFullscreen()
-    setSrc("data:image/webp;base64," + imageSrc.substring(23))
+    exitStream()
+    setSrc("data:image/png;base64," + imageSrc.substring(23))
   }
 
   const videoConstraints = useMemo(
@@ -72,17 +74,24 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
 
   const handleStartCamera = async () => {
     try {
-      navigator.mediaDevices
-        .getUserMedia({ video: videoConstraints })
-        .then(() => setIsCameraActive(true))
-        .catch((err) => {
-          setIsCameraActive(false)
-          alert("Error accessing camera: " + err)
-        })
+      const stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints })
+      setStream(stream)
+
+      setIsCameraActive(true)
     } catch (err) {
       setIsCameraActive(false)
       alert("Error accessing camera: " + err)
     }
+  }
+
+  const isInFullScreen = () => {
+    const doc = document as Document & {
+      fullscreenElement: Element
+      webkitFullscreenElement: Element
+      mozFullScreenElement: Element
+      msFullscreenElement: Element
+    }
+    return doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement
   }
 
   const goFullScreen = () => {
@@ -154,20 +163,16 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     goFullScreen()
   }
 
-  const isInFullScreen = () => {
-    const doc = document as Document & {
-      fullscreenElement: Element
-      webkitFullscreenElement: Element
-      mozFullScreenElement: Element
-      msFullscreenElement: Element
-    }
-    return doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement
-  }
-
   const exitFullscreen = () => {
     isInFullScreen() && exitFullScreen()
     setIsFullscreen(false)
     setIsCameraActive(false)
+    exitStream()
+  }
+
+  const exitStream = () => {
+    stream?.getTracks()?.forEach((track) => track.stop())
+    setStream(null)
   }
 
   useEffect(() => {
@@ -175,19 +180,23 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
 
     const getDevices = async () => {
       try {
-        await navigator.mediaDevices.getUserMedia({ video: true, ...(facingMode && { facingMode: facingMode }) })
+        // Get user permissions on start
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, ...(facingMode && { facingMode: facingMode }) })
+        stream.getTracks().forEach((track) => track.stop())
 
         try {
           const mediaDevices = await navigator.mediaDevices.enumerateDevices()
           const videoDevices = mediaDevices.filter((device) => device.deviceId !== "" && device.kind === "videoinput")
           setDevices(videoDevices)
+          alert(videoDevices.map((device) => `${device.label}`).join(", "))
           if (videoDevices.length === 0) return setNoCamera(true)
 
           setSelectedDeviceId(videoDevices[0].deviceId)
         } catch {
           setDevices([])
         }
-      } catch {
+      } catch (e) {
+        alert(e)
         setNoCamera(true)
       }
     }
@@ -198,6 +207,8 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   const nextDevice = () => {
     if (devices === null || devices.length === 0) return
 
+    exitStream()
+
     const index = devices.findIndex((device) => device.deviceId === selectedDeviceId)
 
     if (index === -1) return setSelectedDeviceId(devices[0].deviceId)
@@ -205,19 +216,8 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   }
 
   useEffect(() => {
-    if (!selectedDeviceId) return
-
-    window.navigator.mediaDevices
-      .getUserMedia({ video: videoConstraints })
-      .then(() => setNoCamera(false))
-      .catch(() => setNoCamera(true))
-
-    // Exit fullscreen on change
-
-    if (window.screen.orientation) {
-      window.screen.orientation.onchange = updateSizes
-    }
-  }, [selectedDeviceId, videoConstraints, updateSizes])
+    if (window.screen.orientation) window.screen.orientation.onchange = updateSizes
+  }, [updateSizes])
 
   document.onfullscreenchange = () => !isInFullScreen() && exitFullscreen()
 
