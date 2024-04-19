@@ -9,28 +9,22 @@ const MirrorButton = ({ mirrorAction, horizontal }: MirrorButtonProps) => {
   const buttonSize = 48
   return (
     <Box
-      style={{
-        width: 48,
-        height: 48,
-        position: "absolute",
-        bottom: horizontal ? "" : 20,
-        top: horizontal ? 20 : "",
-        right: 20,
-        zIndex: 9900,
-      }}
+      width={buttonSize}
+      height={buttonSize}
+      position="absolute"
+      bottom={horizontal ? "" : buttonSize / 2}
+      top={horizontal ? buttonSize / 2 : ""}
+      right={buttonSize / 2}
+      zIndex={9900}
     >
       <IconButton
         onClick={mirrorAction}
         sx={{
           width: buttonSize,
           height: buttonSize,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          border: 0,
           borderRadius: buttonSize / 2,
           color: "rgb(255, 255, 255)",
-          backgroundColor: "rgba(0, 0, 0, 0.3)",
+          backgroundColor: "rgba(0, 0, 0, 0.3)!important",
         }}
       >
         <svg
@@ -39,8 +33,8 @@ const MirrorButton = ({ mirrorAction, horizontal }: MirrorButtonProps) => {
           xmlnsXlink="http://www.w3.org/1999/xlink"
           viewBox="0 0 32 32"
           stroke="currentColor"
-          width={24}
-          height={24}
+          width={buttonSize / 2}
+          height={buttonSize / 2}
         >
           <g fill="none" strokeWidth="1.0" strokeLinejoin="round" stroke="currentColor">
             <polygon points="12,22 3,27 3,5 12,10"></polygon>

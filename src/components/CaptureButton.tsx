@@ -6,37 +6,35 @@ interface CaptureButtonProps {
 }
 
 const CaptureButton = ({ capture, horizontal }: CaptureButtonProps) => {
+  const buttonSize = 72
   return (
     <Box
       style={{
-        width: 72,
-        height: 72,
+        width: buttonSize,
+        height: buttonSize,
         position: "absolute",
-        bottom: horizontal ? "calc(50% - 36px)" : 8,
-        left: horizontal ? "" : "calc(50% - 36px)",
-        right: horizontal ? 8 : "",
+        bottom: horizontal ? `calc(50% - ${buttonSize / 2}px)` : 12,
+        left: horizontal ? "" : `calc(50% - ${buttonSize / 2}px)`,
+        right: horizontal ? 12 : "",
         zIndex: 9999,
       }}
     >
       <IconButton
         onClick={capture}
         sx={{
-          width: 72,
-          height: 72,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          width: buttonSize,
+          height: buttonSize,
           border: 0,
-          borderRadius: 36,
+          borderRadius: buttonSize / 2,
           backgroundColor: "rgba(0, 0, 0, 0.3)",
         }}
       >
         <Box
           sx={{
             backgroundColor: "rgba(255, 255, 255, 0.75)",
-            width: 48,
-            height: 48,
-            borderRadius: 24,
+            width: (2 * buttonSize) / 3,
+            height: (2 * buttonSize) / 3,
+            borderRadius: buttonSize / 3,
           }}
         />
       </IconButton>

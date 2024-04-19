@@ -5,28 +5,16 @@ interface CloseButtonProps {
 }
 
 const CloseButton = ({ closeAction }: CloseButtonProps) => {
+  const buttonSize = 32
   return (
-    <Box
-      sx={{
-        width: 30,
-        height: 30,
-        position: "absolute",
-        top: 15,
-        left: 15,
-        zIndex: 9999,
-      }}
-    >
+    <Box width={buttonSize} height={buttonSize} position="absolute" top={buttonSize / 2} left={buttonSize / 2} zIndex={9999}>
       <IconButton
         onClick={closeAction}
         sx={{
-          width: 32,
-          height: 32,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          border: 0,
-          borderRadius: 16,
-          color: "white",
+          width: buttonSize,
+          height: buttonSize,
+          borderRadius: buttonSize / 2,
+          color: "rgba(255, 255, 255, 0.8)",
           backgroundColor: "rgba(0, 0, 0, 0.3)",
         }}
       >

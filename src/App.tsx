@@ -1,24 +1,24 @@
 import "./App.css"
 
+import { Box } from "@mui/material"
+
 import WebcamComponent from "./components/WebcamComponent"
 
 function App() {
   return (
-    <div
+    <Box
       className="App"
-      style={{
-        height: "100%",
-        minHeight: "100vh",
-        overflow: "hidden",
-        alignContent: "center",
-        alignItems: "center",
-        display: "flex",
-        justifyContent: "center",
-        backgroundColor: "darkcyan",
-      }}
+      height="100%"
+      minHeight="100vh"
+      overflow="hidden"
+      alignContent="center"
+      alignItems="center"
+      display="flex"
+      justifyContent="center"
+      bgcolor="darkcyan"
     >
       <WebcamComponent />
-    </div>
+    </Box>
   )
 }
 
