@@ -10,12 +10,13 @@ function App() {
       className="App"
       height="100%"
       minHeight="100vh"
+      width="100%"
+      minWidth="100vw"
       overflow="hidden"
       alignContent="center"
       alignItems="center"
       display="flex"
       justifyContent="center"
-      bgcolor="darkcyan"
       color="white"
     >
       <WebcamComponent />
