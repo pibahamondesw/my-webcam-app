@@ -261,7 +261,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
         </Box>
       ) : (
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" gap="1rem">
-          {src && <Box component="img" src={src} width="80vw" maxWidth={300} borderRadius="1rem" alt="Captura" />}
+          {src && <Box component="img" src={src} width="80vw" maxWidth={500} borderRadius="1rem" alt="Captura" />}
           <Button
             onClick={startFullScreen}
             id="open-camera"
