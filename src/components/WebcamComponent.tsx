@@ -56,7 +56,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     if (!imageSrc) return alert("No se pudo tomar la foto")
 
     exitFullscreen()
-    setSrc("data:image/png;base64," + imageSrc.substring(23))
+    setSrc(imageSrc)
   }
 
   const videoConstraints = useMemo(
@@ -158,13 +158,15 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   }
 
   const exitFullscreen = () => {
+    exitStream()
     isInFullScreen() && exitFullScreen()
     setIsCameraActive(false)
-    exitStream()
   }
 
   const exitStream = () => {
-    stream?.getTracks()?.forEach((track) => track.stop())
+    if (!stream) return
+
+    stream.getTracks().forEach((track) => track.stop())
     setStream(null)
   }
 
@@ -186,12 +188,12 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
               const auxDevice = device as AuxMediaDeviceInfo
               const capabilities = auxDevice.getCapabilities && auxDevice.getCapabilities()
               return (
-                capabilities?.facingMode?.includes("user") ||
                 device.label.toLowerCase().includes("front") ||
                 device.label.toLowerCase().includes("user") ||
                 device.label.toLowerCase().includes("selfie") ||
                 device.label.toLowerCase().includes("frontal") ||
                 device.label.toLowerCase().includes("face") ||
+                capabilities?.facingMode?.includes("user") ||
                 (capabilities &&
                   ((capabilities.facingMode?.length === 0 && capabilities.height?.max) || 0) > (capabilities.width?.max || 0))
               )
@@ -200,12 +202,12 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
               const auxDevice = device as AuxMediaDeviceInfo
               const capabilities = auxDevice.getCapabilities && auxDevice.getCapabilities()
               return (
-                capabilities?.facingMode?.includes("environment") ||
                 device.label.toLowerCase().includes("back") ||
                 device.label.toLowerCase().includes("environment") ||
                 device.label.toLowerCase().includes("rear") ||
                 device.label.toLowerCase().includes("world") ||
                 device.label.toLowerCase().includes("posterior") ||
+                capabilities?.facingMode?.includes("environment") ||
                 (capabilities &&
                   ((capabilities.facingMode?.length === 0 && capabilities.width?.max) || 0) > (capabilities.height?.max || 0))
               )
@@ -290,7 +292,11 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   )
 
   // Exit on escape
-  document.onkeydown = (e) => e.key === "Escape" && exitFullscreen()
+  document.onkeyup = (e) => {
+    e.preventDefault()
+    if (e.key === "Escape") exitFullscreen()
+    else if (e.key === "Enter") capture()
+  }
 
   return selectedDeviceId === "" ? (
     <Alert icon={<VideocamOff />} severity="error" sx={{ boxShadow: "0 0 1rem rgba(0, 0, 0, 0.25)" }}>
@@ -315,15 +321,18 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
             height={isMobile ? height : 0.6 * height}
             width={isMobile ? width : 0.6 * width}
             style={style}
+            screenshotFormat={"image/webp"}
+            screenshotQuality={1.0}
+            forceScreenshotSourceSize={true}
           />
           <CloseButton closeAction={exitFullscreen} mobile={isMobile} />
-          {!facingMode && devices.length > 0 && <ChangeDeviceButton changeDevice={nextDevice} horizontal={horizontal} mobile={isMobile} />}
+          {!facingMode && devices.length > 1 && <ChangeDeviceButton changeDevice={nextDevice} horizontal={horizontal} mobile={isMobile} />}
           <CaptureButton capture={capture} horizontal={horizontal} mobile={isMobile} />
           <MirrorButton mirrorAction={() => setUseMirror(!useMirror)} horizontal={horizontal} mobile={isMobile} />
         </Box>
       ) : (
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" gap="1rem" my={3} minHeight={height}>
-          {src && <Box component="img" src={src} width="80vw" maxWidth={500} borderRadius="1rem" alt="Captura" />}
+          {src && <Box component="img" src={src} width="90vw" maxWidth={500} borderRadius="1rem" alt="Captura" />}
           <Button
             onClick={startFullScreen}
             id="open-camera"
