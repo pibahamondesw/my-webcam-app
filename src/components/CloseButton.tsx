@@ -39,6 +39,9 @@ const CloseButton = ({ closeAction, mobile }: CloseButtonProps) => {
           color: "rgba(255, 255, 255, 0.8)",
           backgroundColor: "rgba(0, 0, 0, 0.3)",
           boxShadow: "0 0 1rem 0 rgba(0, 0, 0, 0.25)!important",
+          "&:hover": {
+            backgroundColor: "rgba(127, 0, 0, 0.5)",
+          },
         }}
       >
         <CloseSvg size={20} />
