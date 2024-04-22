@@ -46,12 +46,8 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   }, [])
 
   window.onresize = updateSizes
-
-  useEffect(() => {
-    if (!webcamRef.current?.video) return
-
-    webcamRef.current.video.onloadeddata = updateSizes
-  }, [webcamRef.current?.video, updateSizes])
+  if (webcamRef.current?.video) webcamRef.current.video.onloadeddata = updateSizes
+  if (window.screen.orientation) window.screen.orientation.onchange = updateSizes
 
   const capture = () => {
     const imageSrc = webcamRef.current?.getScreenshot()
@@ -181,11 +177,9 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   }
 
   useEffect(() => {
-    if (stream) return
+    if (stream || !selectedDeviceId) return
 
-    if (selectedDeviceId) {
-      navigator.mediaDevices.getUserMedia({ video: videoConstraints }).then((stream) => setStream(stream))
-    }
+    navigator.mediaDevices.getUserMedia({ video: videoConstraints }).then((stream) => setStream(stream))
   }, [stream, selectedDeviceId, videoConstraints])
 
   useEffect(() => {
@@ -194,11 +188,6 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     const expectedFacingMode = stream.getTracks()[0].getSettings().facingMode
     setUseMirror(expectedFacingMode !== "environment")
   }, [stream, selectedDeviceId])
-
-  useEffect(() => {
-    if (window.screen.orientation) window.screen.orientation.onchange = updateSizes
-    window.onresize = updateSizes
-  }, [updateSizes])
 
   document.onfullscreenchange = () => !isFullscreen() && exitWebcam()
 
