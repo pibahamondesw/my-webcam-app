@@ -202,7 +202,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
 
   document.onfullscreenchange = () => !isFullscreen() && exitWebcam()
 
-  const style = useMemo(
+  const webcamStyle = useMemo(
     () => ({
       position: "absolute" as "absolute",
       top: 0,
@@ -257,7 +257,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
             videoConstraints={videoConstraints}
             height={isMobile ? height : 0.6 * height}
             width={isMobile ? width : 0.6 * width}
-            style={style}
+            style={webcamStyle}
             screenshotFormat={"image/webp"}
             screenshotQuality={1.0}
             forceScreenshotSourceSize={true}
