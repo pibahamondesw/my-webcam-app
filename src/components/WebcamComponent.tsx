@@ -20,6 +20,7 @@ interface AuxMediaDeviceInfo extends MediaDeviceInfo {
 const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   const [width, setWidth] = useState(Math.min(window.innerWidth, window.screen.width))
   const [height, setHeight] = useState(Math.min(window.innerHeight, window.screen.height))
+  const [isCameraActive, setIsCameraActive] = useState(false)
   const [devices, setDevices] = useState<MediaDeviceInfo[] | null>(null)
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null)
   const [stream, setStream] = useState<MediaStream | null>(null)
@@ -77,8 +78,10 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints })
       setStream(stream)
+
+      setIsCameraActive(true)
     } catch (err) {
-      setStream(null)
+      setIsCameraActive(false)
       alert("Error accessing camera: " + err)
     }
   }
@@ -157,6 +160,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   const exitFullscreen = () => {
     exitStream()
     isInFullScreen() && exitFullScreen()
+    setIsCameraActive(false)
   }
 
   const exitStream = () => {
@@ -308,7 +312,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     </Alert>
   ) : (
     <>
-      {stream ? (
+      {isCameraActive ? (
         <Box id="webcam-interface" sx={otherStyle}>
           <Webcam
             ref={webcamRef}
@@ -334,7 +338,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
             id="open-camera"
             disabled={!selectedDeviceId}
             sx={{
-              display: stream ? "none" : "flex",
+              display: isCameraActive ? "none" : "flex",
               p: "1.5rem",
               m: 3,
               color: "white",
