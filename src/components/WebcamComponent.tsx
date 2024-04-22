@@ -258,7 +258,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
             height={isMobile ? height : 0.6 * height}
             width={isMobile ? width : 0.6 * width}
             style={webcamStyle}
-            screenshotFormat={"image/webp"}
+            screenshotFormat={"image/png"}
             screenshotQuality={1.0}
             forceScreenshotSourceSize={true}
           />
