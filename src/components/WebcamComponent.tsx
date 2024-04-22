@@ -232,7 +232,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   document.onkeyup = (e) => {
     e.preventDefault()
     if (e.key === "Escape") exitWebcam()
-    else if (e.key === "Enter") capture()
+    else if (isCameraActive && e.key === "Enter") capture()
   }
 
   return selectedDeviceId === "" ? (
