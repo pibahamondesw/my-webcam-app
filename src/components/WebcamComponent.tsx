@@ -19,30 +19,30 @@ interface AuxMediaDeviceInfo extends MediaDeviceInfo {
 }
 
 const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
-  const [width, setWidth] = useState(Math.min(window.innerWidth, window.screen.width))
-  const [height, setHeight] = useState(Math.min(window.innerHeight, window.screen.height))
+  const initialWidth = Math.min(window.innerWidth, window.screen.width)
+  const initialHeight = Math.min(window.innerHeight, window.screen.height)
+  const [width, setWidth] = useState(initialWidth)
+  const [height, setHeight] = useState(initialHeight)
   const [isCameraActive, setIsCameraActive] = useState(false)
   const [devices, setDevices] = useState<MediaDeviceInfo[] | null>(null)
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null)
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [src, setSrc] = useState<string | null>(null)
-  const [horizontal, setHorizontal] = useState<boolean>(
-    Math.min(window.innerWidth, window.screen.width) >= Math.min(window.innerHeight, window.screen.height)
-  )
+  const [horizontal, setHorizontal] = useState<boolean>(initialWidth >= initialHeight)
   const [useMirror, setUseMirror] = useState<boolean>(facingMode === undefined || facingMode === "user")
-  const [isMobile, setIsMobile] = useState<boolean>(
-    Math.min(window.innerHeight, window.screen.height) < 600 || Math.min(window.innerWidth, window.screen.width) < 600
-  )
+  const [isMobile, setIsMobile] = useState<boolean>(initialHeight < 600 || initialWidth < 600)
 
   const webcamRef = useRef<Webcam | null>(null)
 
   const { enterFullscreen, exitFullscreen, isFullscreen } = useContext(FullscreenContext)
 
   const updateSizes = () => {
-    setWidth(Math.min(window.innerWidth, window.screen.width))
-    setHeight(Math.min(window.innerHeight, window.screen.height))
-    setHorizontal(Math.min(window.innerWidth, window.screen.width) >= Math.min(window.innerHeight, window.screen.height))
-    setIsMobile(Math.min(window.innerHeight, window.screen.height) < 600 || Math.min(window.innerWidth, window.screen.width) < 600)
+    const currentWidth = Math.min(window.innerWidth, window.screen.width)
+    const currentHeight = Math.min(window.innerHeight, window.screen.height)
+    setWidth(currentWidth)
+    setHeight(currentHeight)
+    setHorizontal(currentWidth >= currentHeight)
+    setIsMobile(currentHeight < 600 || currentWidth < 600)
   }
 
   window.onresize = updateSizes
@@ -275,7 +275,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
               textOverflow: "ellipsis",
               maxWidth: "80vw",
               textTransform: "none",
-              fontSize: "1.5rem",
+              fontSize: Math.min(Math.max(12, width / 20), 25),
               "&:hover": {
                 bgcolor: "rgba(0, 0, 0, 0.75)",
               },
