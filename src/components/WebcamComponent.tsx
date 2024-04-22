@@ -193,13 +193,13 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
 
   const webcamStyle = useMemo(
     () => ({
-      position: "absolute" as "absolute",
+      position: "absolute" as const,
       top: 0,
       left: 0,
       height: isMobile ? height : height - 150,
       width: width,
       backgroundColor: "black",
-      objectFit: isMobile ? ("cover" as "cover") : ("contain" as "contain"),
+      objectFit: (isMobile ? "cover" : "contain") as "cover" | "contain",
       aspectRatio: `${((width * 1.0) / height) * 1.0}`,
       display: "block",
       transform: useMirror ? "scaleX(-1) " : "",
