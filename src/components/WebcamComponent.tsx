@@ -92,7 +92,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
 
   const exitWebcam = () => {
     exitStream()
-    isFullscreen() && exitFullscreen()
+    exitFullscreen()
     setIsCameraActive(false)
   }
 

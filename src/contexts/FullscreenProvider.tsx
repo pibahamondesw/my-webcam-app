@@ -48,6 +48,8 @@ const FullscreenProvider = ({ children }: FullscreenProviderProps) => {
   }
 
   const exitFullscreen = () => {
+    if (!isFullscreen()) return
+
     const doc = document as Document & {
       webkitExitFullscreen(): Promise<void>
       mozCancelFullScreen(): Promise<void>
