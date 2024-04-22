@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import Webcam from "react-webcam"
 
 import { VideocamOff } from "@mui/icons-material"
 import { Alert, Box, Button, CircularProgress } from "@mui/material"
 
+import FullscreenContext from "../contexts/FullscreenContext"
 import CaptureButton from "./CaptureButton"
 import ChangeDeviceButton from "./ChangeDeviceButton"
 import CloseButton from "./CloseButton"
@@ -35,6 +36,8 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
 
   const webcamRef = useRef<Webcam | null>(null)
 
+  const { enterFullscreen, exitFullscreen, isFullscreen } = useContext(FullscreenContext)
+
   const updateSizes = useCallback(() => {
     setWidth(Math.min(window.innerWidth, window.screen.width))
     setHeight(Math.min(window.innerHeight, window.screen.height))
@@ -55,7 +58,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
 
     if (!imageSrc) return alert("No se pudo tomar la foto")
 
-    exitFullscreen()
+    exitWebcam()
     setSrc(imageSrc)
   }
 
@@ -74,7 +77,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     [height, width, selectedDeviceId, facingMode]
   )
 
-  const handleStartCamera = async () => {
+  const startStream = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints })
       setStream(stream)
@@ -86,80 +89,14 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     }
   }
 
-  const isInFullScreen = () => {
-    const doc = document as Document & {
-      fullscreenElement: Element
-      webkitFullscreenElement: Element
-      mozFullScreenElement: Element
-      msFullscreenElement: Element
-    }
-    return doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement
+  const startWebcam = () => {
+    startStream()
+    enterFullscreen()
   }
 
-  const goFullScreen = () => {
-    const docElement = document.documentElement as HTMLElement & {
-      webkitRequestFullscreen(): Promise<void>
-      webkitEnterFullScreen(): Promise<void>
-      mozRequestFullScreen(): Promise<void>
-      msRequestFullscreen(): Promise<void>
-    }
-    if (docElement.requestFullscreen) docElement.requestFullscreen() // W3C standard
-    else if (docElement.webkitRequestFullscreen) docElement.webkitRequestFullscreen() // WebKit (Apple)
-    else if (docElement.webkitEnterFullScreen) docElement.webkitEnterFullScreen() // WebKit (Apple alternative)
-    else if (docElement.mozRequestFullScreen) docElement.mozRequestFullScreen() // Mozilla (Firefox)
-    else if (docElement.msRequestFullscreen) docElement.msRequestFullscreen() // Microsoft
-    else {
-      const video = document.getElementsByTagName("video")[0] as HTMLVideoElement & {
-        webkitRequestFullscreen(): Promise<void>
-        webkitEnterFullScreen(): Promise<void>
-        mozRequestFullScreen(): Promise<void>
-        msRequestFullscreen(): Promise<void>
-      }
-      if (!video) return console.error("Fullscreen not supported")
-
-      if (video.requestFullscreen) video.requestFullscreen() // W3C standard
-      else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen() // WebKit (Apple)
-      else if (video.webkitEnterFullScreen) video.webkitEnterFullScreen() // WebKit (Apple)
-      else if (video.mozRequestFullScreen) video.mozRequestFullScreen() // Mozilla (Firefox)
-      else if (video.msRequestFullscreen) video.msRequestFullscreen() // Microsoft
-      else return console.error("Fullscreen not supported")
-    }
-  }
-
-  const exitFullScreen = () => {
-    const doc = document as Document & {
-      webkitExitFullscreen(): Promise<void>
-      mozCancelFullScreen(): Promise<void>
-      msExitFullscreen(): Promise<void>
-    }
-    if (doc.exitFullscreen) doc.exitFullscreen() // W3C standard
-    else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen() // WebKit (Apple)
-    else if (doc.mozCancelFullScreen) doc.mozCancelFullScreen() // Mozilla (Firefox)
-    else if (doc.msExitFullscreen) doc.msExitFullscreen() // Microsoft
-    else {
-      const videoElement = document.getElementsByTagName("video")[0] as HTMLVideoElement & {
-        exitFullscreen(): Promise<void>
-        webkitExitFullscreen(): Promise<void>
-        mozCancelFullScreen(): Promise<void>
-        msExitFullscreen(): Promise<void>
-      }
-      if (!videoElement) console.error("Fullscreen not supported")
-      else if (videoElement.exitFullscreen) videoElement.exitFullscreen() // W3C standard
-      else if (videoElement.webkitExitFullscreen) videoElement.webkitExitFullscreen() // WebKit (Apple)
-      else if (videoElement.mozCancelFullScreen) videoElement.mozCancelFullScreen() // Mozilla (Firefox)
-      else if (videoElement.msExitFullscreen) videoElement.msExitFullscreen() // Microsoft
-      else console.error("Fullscreen not supported")
-    }
-  }
-
-  const startFullScreen = () => {
-    handleStartCamera()
-    goFullScreen()
-  }
-
-  const exitFullscreen = () => {
+  const exitWebcam = () => {
     exitStream()
-    isInFullScreen() && exitFullScreen()
+    isFullscreen() && exitFullscreen()
     setIsCameraActive(false)
   }
 
@@ -263,7 +200,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
     window.onresize = updateSizes
   }, [updateSizes])
 
-  document.onfullscreenchange = () => !isInFullScreen() && exitFullscreen()
+  document.onfullscreenchange = () => !isFullscreen() && exitWebcam()
 
   const style = useMemo(
     () => ({
@@ -294,7 +231,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
   // Exit on escape
   document.onkeyup = (e) => {
     e.preventDefault()
-    if (e.key === "Escape") exitFullscreen()
+    if (e.key === "Escape") exitWebcam()
     else if (e.key === "Enter") capture()
   }
 
@@ -325,7 +262,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
             screenshotQuality={1.0}
             forceScreenshotSourceSize={true}
           />
-          <CloseButton closeAction={exitFullscreen} mobile={isMobile} />
+          <CloseButton closeAction={exitWebcam} mobile={isMobile} />
           {!facingMode && devices.length > 1 && <ChangeDeviceButton changeDevice={nextDevice} horizontal={horizontal} mobile={isMobile} />}
           <CaptureButton capture={capture} horizontal={horizontal} mobile={isMobile} />
           <MirrorButton mirrorAction={() => setUseMirror(!useMirror)} horizontal={horizontal} mobile={isMobile} />
@@ -334,7 +271,7 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" gap="1rem" my={3} minHeight={height}>
           {src && <Box component="img" src={src} width="90vw" maxWidth={500} borderRadius="1rem" alt="Captura" />}
           <Button
-            onClick={startFullScreen}
+            onClick={startWebcam}
             id="open-camera"
             disabled={!selectedDeviceId}
             sx={{
