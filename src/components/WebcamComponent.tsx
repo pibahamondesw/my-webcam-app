@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
+import { useContext, useEffect, useMemo, useRef, useState } from "react"
 import Webcam from "react-webcam"
 
 import { VideocamOff } from "@mui/icons-material"
@@ -38,12 +38,12 @@ const WebcamComponent = ({ facingMode }: WebcamComponentProps) => {
 
   const { enterFullscreen, exitFullscreen, isFullscreen } = useContext(FullscreenContext)
 
-  const updateSizes = useCallback(() => {
+  const updateSizes = () => {
     setWidth(Math.min(window.innerWidth, window.screen.width))
     setHeight(Math.min(window.innerHeight, window.screen.height))
     setHorizontal(Math.min(window.innerWidth, window.screen.width) >= Math.min(window.innerHeight, window.screen.height))
     setIsMobile(Math.min(window.innerHeight, window.screen.height) < 600 || Math.min(window.innerWidth, window.screen.width) < 600)
-  }, [])
+  }
 
   window.onresize = updateSizes
   if (webcamRef.current?.video) webcamRef.current.video.onloadeddata = updateSizes
