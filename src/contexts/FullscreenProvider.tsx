@@ -45,6 +45,9 @@ const FullscreenProvider = ({ children }: FullscreenProviderProps) => {
       else if (video.msRequestFullscreen) video.msRequestFullscreen() // Microsoft
       else return console.error("Fullscreen not supported")
     }
+
+    // go to top left of screen
+    window.scrollTo(0, 0)
   }
 
   const exitFullscreen = () => {
